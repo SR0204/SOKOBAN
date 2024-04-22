@@ -25,11 +25,59 @@ public class GameManegerScript : MonoBehaviour
         }
         return -1;
     }
+
+    bool MoveNumber(int number, int movefarm, int moveTo)
+    {
+        if (moveTo < 0 || moveTo >= map.Length) { return false; }
+        if (map[moveTo] == 2)
+        {
+            int verocity = moveTo - movefarm;
+
+            bool success = MoveNumber(2, moveTo, moveTo + verocity);
+            if (!success) { return false; }
+
+        }
+        map[moveTo] = number;
+        map[movefarm] = 0;
+        return true;
+    }
+
+
     int[] map = { 0, 0, 0, 2, 0, 1, 0, 2, 0, 0, 0 };
+
+
     string debugTXT = "";
+
+
+
     // Start is called before the first frame update
     void Start()
     {
+
+      //int[,] map;
+      //
+      //map = new int[,]
+      //{
+      //    {0,0,0,0,0 },
+      //    {0,0,1,0,0 },
+      //    {0,0,0,0,0 },
+      //};
+      //
+      //string debugTXT = "";
+      //
+      ////変更。二重for文で二重配列の情報を出力
+      //for (int y = 0; y < map.GetLength(0); y++)
+      //{
+      //    for (int x = 0; x < map.GetLength(1); x++)
+      //    {
+      //        debugTXT += map[x, y].ToString() + ",";
+      //    }
+      //    debugTXT += "\n";//改行
+      //
+      //}
+      //
+      //Debug.Log(debugTXT);
+
         PrintArray();
     }
 
@@ -40,36 +88,20 @@ public class GameManegerScript : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.RightArrow))
         {
             int PlayerIndex = GetPlayerIndex();
-
+      
             PrintArray();
-
+      
             MoveNumber(1, PlayerIndex, PlayerIndex + 1);
         }
-
-
+      
+      
         if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
             int PlayerIndex = GetPlayerIndex();
-
+      
             PrintArray();
             MoveNumber(1, PlayerIndex, PlayerIndex - 1);
-
-        }
-
-        bool MoveNumber(int number, int movefarm, int moveTo)
-        {
-            if (moveTo < 0 || moveTo >= map.Length) { return false; }
-            if (map[moveTo] == 2)
-            {
-                int verocity = moveTo - movefarm;
-
-                bool success = MoveNumber(2, moveTo, moveTo + verocity);
-                if (!success) { return false; }
-
-            }
-            map[moveTo] = number;
-            map[movefarm] = 0;
-            return true;
+      
         }
     }
 }
