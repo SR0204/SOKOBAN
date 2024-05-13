@@ -13,6 +13,10 @@ public class GameManegerScript : MonoBehaviour
     //追加
     public GameObject PlayerPrefab;
     public GameObject boxPrefab;
+    public GameObject goalPrefab;
+
+    public GameObject clearText;
+
     int[,] map;
     GameObject[,] field;//ゲーム管理用の配列
 
@@ -28,10 +32,11 @@ public class GameManegerScript : MonoBehaviour
 
         map = new int[,]
         {
-          {0,2,0,0,0 },
-          {0,2,1,0,0 },
-          {0,2,0,0,0 },
-
+          {0,0,0,0,0 },
+          {0,3,1,3,0 },
+          {0,0,2,0,0 },
+          {0,2,3,2,0 },
+          {0,0,0,0,0 },
         };
 
         field = new GameObject
@@ -115,6 +120,13 @@ public class GameManegerScript : MonoBehaviour
                 playerIndex,
                 playerIndex + new Vector2Int(1, 0));
             //PrintArray();
+
+            //もしクリアしていたら
+            if (IsCleard())
+            {
+                //ゲームオブジェクトのSetActiveメソッドを使い有効か
+                clearText.SetActive(true);
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.LeftArrow))
@@ -124,6 +136,13 @@ public class GameManegerScript : MonoBehaviour
                 playerIndex,
                 playerIndex + new Vector2Int(-1, 0));
             //PrintArray();
+
+            //もしクリアしていたら
+            if (IsCleard())
+            {
+                //ゲームオブジェクトのSetActiveメソッドを使い有効か
+                clearText.SetActive(true);
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.UpArrow))
@@ -133,6 +152,13 @@ public class GameManegerScript : MonoBehaviour
                 playerIndex,
                 playerIndex + new Vector2Int(0, -1));
             //PrintArray();
+
+            //もしクリアしていたら
+            if (IsCleard())
+            {
+                //ゲームオブジェクトのSetActiveメソッドを使い有効か
+                clearText.SetActive(true);
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.DownArrow))
@@ -142,8 +168,47 @@ public class GameManegerScript : MonoBehaviour
                 playerIndex,
                 playerIndex + new Vector2Int(0, 1));
             //PrintArray();
+
+            //もしクリアしていたら
+            if (IsCleard())
+            {
+                //ゲームオブジェクトのSetActiveメソッドを使い有効か
+                clearText.SetActive(true);
+            }
         }
     }
+
+    bool IsCleard()
+    {
+        //Vector2Intの可変長配列の作成
+        List<Vector2Int> goals = new List<Vector2Int>();
+
+        for (int y = 0; y < map.GetLength(0); y++)
+        {
+            for (int x = 0; x < map.GetLength(1); x++)
+            {
+                //格納場所か否かを判断
+                if (map[y, x] == 3)
+                {
+                    goals.Add(new Vector2Int(x, y));
+                }
+            }
+        }
+
+        //要素数はgoals.Countで取得
+        for (int i = 0; i < goals.Count; i++)
+        {
+            GameObject f = field[goals[i].y, goals[i].x];
+            if (f == null || f.tag != "Box")
+            {
+                //一つでも箱がなかったら条件未達成
+                return false;
+            }
+        }
+        //条件未達成でなければ条件達成
+        return true;
+    }
+
 
     bool MoveNumber(Vector2Int moveFrom, Vector2Int moveTo)
     {
@@ -154,7 +219,7 @@ public class GameManegerScript : MonoBehaviour
         if (moveTo.x < 0 || moveTo.x >= field.GetLength(1)) { return false; }
 
         //Boxタグを持っていたら再起処理
-        if (field[moveTo.y ,moveTo.x] != null && field[moveTo.y, moveTo.x].tag == "Box")
+        if (field[moveTo.y, moveTo.x] != null && field[moveTo.y, moveTo.x].tag == "Box")
         {
             Vector2Int velocity = moveTo - moveFrom;
             bool success = MoveNumber(moveTo, moveTo + velocity);
@@ -163,7 +228,7 @@ public class GameManegerScript : MonoBehaviour
 
         //GameObjectの座標(position)を稼働させてからインデックスを入れ替え
 
-        field[moveFrom.y, moveFrom.x].transform.position =new Vector3(moveTo.x, field.GetLength(0) - moveTo.y, 0);
+        field[moveFrom.y, moveFrom.x].transform.position = new Vector3(moveTo.x, field.GetLength(0) - moveTo.y, 0);
         field[moveTo.y, moveTo.x] = field[moveFrom.y, moveFrom.x];
 
         field[moveFrom.y, moveFrom.x] = null;
