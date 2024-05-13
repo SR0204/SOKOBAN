@@ -12,6 +12,7 @@ public class GameManegerScript : MonoBehaviour
 
     //追加
     public GameObject PlayerPrefab;
+    public GameObject boxPrefab;
     int[,] map;
     GameObject[,] field;//ゲーム管理用の配列
 
@@ -27,10 +28,17 @@ public class GameManegerScript : MonoBehaviour
 
         map = new int[,]
         {
-          {1,0,0,0,0 },
-          {0,0,0,0,0 },
-          {0,0,0,0,0 },
+          {0,2,0,0,0 },
+          {0,2,1,0,0 },
+          {0,2,0,0,0 },
+
         };
+
+        field = new GameObject
+            [
+            map.GetLength(0),
+            map.GetLength(1)
+            ];
 
         string debugTXT = "";
 
@@ -48,17 +56,27 @@ public class GameManegerScript : MonoBehaviour
                         );
                 }
 
+                if (map[y, x] == 2)
+                {
+                    field[y, x] = Instantiate(
+                        boxPrefab,
+                        new Vector3(x, map.GetLength(0) - y, 0),
+                        Quaternion.identity);
+                }
+
                 //debugTXT += map[x, y].ToString() + ",";
+
             }
             //debugTXT += "\n";//改行
 
         }
 
+
+
         Debug.Log(debugTXT);
 
         //PrintArray();
     }
-
 
     //private void PrintArray()
     //{
@@ -86,9 +104,48 @@ public class GameManegerScript : MonoBehaviour
 
     //nullチェックをしてからタグのチェックを行う
 
+    //Update is called once per frame
+    void Update()
+    {
 
+        if (Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            Vector2Int playerIndex = GetPlayerIndex();
+            MoveNumber(
+                playerIndex,
+                playerIndex + new Vector2Int(1, 0));
+            //PrintArray();
+        }
 
-    bool MoveNumber(string tag, Vector2Int moveFrom, Vector2Int moveTo)
+        if (Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            Vector2Int playerIndex = GetPlayerIndex();
+            MoveNumber(
+                playerIndex,
+                playerIndex + new Vector2Int(-1, 0));
+            //PrintArray();
+        }
+
+        if (Input.GetKeyDown(KeyCode.UpArrow))
+        {
+            Vector2Int playerIndex = GetPlayerIndex();
+            MoveNumber(
+                playerIndex,
+                playerIndex + new Vector2Int(0, -1));
+            //PrintArray();
+        }
+
+        if (Input.GetKeyDown(KeyCode.DownArrow))
+        {
+            Vector2Int playerIndex = GetPlayerIndex();
+            MoveNumber(
+                playerIndex,
+                playerIndex + new Vector2Int(0, 1));
+            //PrintArray();
+        }
+    }
+
+    bool MoveNumber(Vector2Int moveFrom, Vector2Int moveTo)
     {
 
 
@@ -97,47 +154,31 @@ public class GameManegerScript : MonoBehaviour
         if (moveTo.x < 0 || moveTo.x >= field.GetLength(1)) { return false; }
 
         //Boxタグを持っていたら再起処理
-        if (field[moveTo.x, moveTo.y] != null && field[moveTo.y, moveTo.x].tag == "Box")
+        if (field[moveTo.y ,moveTo.x] != null && field[moveTo.y, moveTo.x].tag == "Box")
         {
             Vector2Int velocity = moveTo - moveFrom;
-            bool success = MoveNumber(tag, moveTo, moveTo + velocity);
+            bool success = MoveNumber(moveTo, moveTo + velocity);
             if (!success) { return false; }
         }
 
         //GameObjectの座標(position)を稼働させてからインデックスを入れ替え
 
-        field[moveFrom.y, moveFrom.x].transform.position =
-            new Vector3(moveTo.x, field.GetLength(0) - moveTo.y, 0);
+        field[moveFrom.y, moveFrom.x].transform.position =new Vector3(moveTo.x, field.GetLength(0) - moveTo.y, 0);
         field[moveTo.y, moveTo.x] = field[moveFrom.y, moveFrom.x];
-
-        field[moveFrom.y, moveFrom.x].transform.position = new Vector3(moveTo.x, field.GetLength(0) - moveTo.y, 0);
 
         field[moveFrom.y, moveFrom.x] = null;
 
-        if (field[moveTo.y, moveTo.x] != null && field[moveTo.y, moveTo.x].tag == "Box")
-        {
-            Vector2Int velocity = moveTo - moveFrom;
-            bool success = MoveNumber(tag, moveTo, moveTo + velocity);
-            if (!success) { return false; }
-        }
-
         return true;
-
-
-
-
 
     }
 
 
+
 }
 
+
+
 //int[] map = { 0, 0, 0, 2, 0, 1, 0, 2, 0, 0, 0 };
-
-
-
-
-
 
 // Start is called before the first frame update
 //void Start()
@@ -146,15 +187,7 @@ public class GameManegerScript : MonoBehaviour
 //   // PrintArray();
 //}
 
-// Update is called once per frame
-//void Update()
-//{
 
-//if (Input.GetKeyDown(KeyCode.RightArrow))
-//{
-//    int PlayerIndex = GetPlayerIndex();
-//
-//    PrintArray();
 //
 //    MoveNumber(1, PlayerIndex, PlayerIndex + 1);
 //}
