@@ -236,7 +236,11 @@ public class GameManegerScript : MonoBehaviour
 
         //GameObjectの座標(position)を稼働させてからインデックスを入れ替え
 
-        field[moveFrom.y, moveFrom.x].transform.position = new Vector3(moveTo.x, field.GetLength(0) - moveTo.y, 0);
+        // field[moveFrom.y, moveFrom.x].transform.position = new Vector3(moveTo.x, field.GetLength(0) - moveTo.y, 0);
+        Vector3 moveToPosition = new Vector3(
+            moveTo.x, map.GetLength(0) - moveTo.y, 0);
+        field[moveFrom.y, moveFrom.x].GetComponent<Move>().MoveTo(moveToPosition);
+
         field[moveTo.y, moveTo.x] = field[moveFrom.y, moveFrom.x];
 
         field[moveFrom.y, moveFrom.x] = null;
